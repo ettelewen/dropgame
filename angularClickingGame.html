@@ -35,6 +35,10 @@
         There might soon be issues with adding numbers: 10000000000000000 + 1 == {{10000000000000000+1}}
       </div>
 
+      <div class="progress">
+        <div class="progress-bar" ng-style="{width: drops/10000*100 + '%'}"></div>
+      </div>
+
       <button class="btn btn-default" ng-click="drops = drops+1">Add <i class="glyphicon glyphicon-tint"></i></button>
       <button class="btn btn-default" ng-click="drops = drops*10">Multiply by 10</button>
     </div>
