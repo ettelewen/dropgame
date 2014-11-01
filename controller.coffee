@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module 'clickingGame', []
+angular.module 'clickingGame', ['ui.bootstrap']
 .controller 'RootCtrl', ($scope, $timeout, $interval, CanvasDrawing) ->
   $scope.drops = 0
 
