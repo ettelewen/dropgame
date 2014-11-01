@@ -24,30 +24,30 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
   return $scope.canvasClick = function($event) {
     var pt;
     pt = getXY($event);
-    return _.times(10000, function() {
+    return _.times(10, function() {
       var size;
-      size = _.random(20, 64);
+      size = _.normalRandom(40, 20);
       CanvasDrawing.addDrop({
         img: _.sample(dropImages, 1)[0],
         x: pt.x - size / 2,
         y: pt.y - size / 3,
         w: size,
         h: size,
-        xspeed: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3),
-        yspeed: _.random(-15, -3)
+        xspeed: _.normalRandom(0, 10),
+        yspeed: _.normalRandom(-9, 6),
+        yacceleration: 1
       });
       return $scope.drops++;
     });
   };
 }).factory('CanvasDrawing', function() {
-  var accumulator, animloop, canvas, ctx, currTime, drops, moveDrop, movedt, render, yacceleration;
+  var accumulator, animloop, canvas, ctx, currTime, drops, moveDrop, movedt, render;
   canvas = document.getElementById('canvas');
   ctx = new Context2DWrapper(canvas.getContext('2d'));
   drops = [];
-  yacceleration = 1;
   moveDrop = function(drop) {
     drop.y = drop.y + drop.yspeed;
-    drop.yspeed = drop.yspeed + yacceleration;
+    drop.yspeed = drop.yspeed + drop.yacceleration;
     drop.xspeed = drop.xspeed / 1.03;
     drop.x += drop.xspeed;
     return drop.y < 700;
@@ -80,4 +80,12 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
       return drops.push(obj);
     }
   };
+});
+
+_.mixin({
+  normalRandom: function(middle, delta) {
+    var max, min, _ref;
+    _ref = [middle - delta, middle + delta], min = _ref[0], max = _ref[1];
+    return (_.random(min, max) + _.random(min, max) + _.random(min, max)) / 3;
+  }
 });

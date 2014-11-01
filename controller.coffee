@@ -16,16 +16,17 @@ angular.module 'clickingGame', []
 
   $scope.canvasClick = ($event) ->
     pt = getXY $event
-    _.times 10000, () ->
-      size = _.random(20, 64)
+    _.times 10, () ->
+      size = _.normalRandom(40, 20)
       CanvasDrawing.addDrop
         img: _.sample(dropImages, 1)[0]
         x: pt.x - size/2
         y: pt.y - size/3
         w: size
         h: size
-        xspeed: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3) # normally distributed random
-        yspeed: _.random(-15, -3)
+        xspeed: _.normalRandom(0, 10)
+        yspeed: _.normalRandom(-9, 6)
+        yacceleration: 1
       $scope.drops++;
 
 
@@ -35,10 +36,9 @@ angular.module 'clickingGame', []
 
   drops = []
 
-  yacceleration = 1
   moveDrop = (drop) ->
     drop.y = drop.y + drop.yspeed
-    drop.yspeed = drop.yspeed + yacceleration
+    drop.yspeed = drop.yspeed + drop.yacceleration
     drop.xspeed = drop.xspeed/1.03
     drop.x += drop.xspeed
     drop.y < 700
@@ -69,3 +69,8 @@ angular.module 'clickingGame', []
   return {
     addDrop: (obj) -> drops.push obj
   }
+
+_.mixin
+  normalRandom: (middle, delta) -> # normally distributed random
+    [min, max] = [middle-delta, middle+delta]
+    (_.random(min, max) + _.random(min, max) + _.random(min, max))/3
