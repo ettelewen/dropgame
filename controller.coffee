@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module 'clickingGame', []
-.controller 'RootCtrl', ($scope, $timeout, CanvasDrawing) ->
+.controller 'RootCtrl', ($scope, $timeout, $interval, CanvasDrawing) ->
   $scope.drops = 0
 
   CanvasDrawing.onDrops (numDrops) ->
@@ -19,10 +19,10 @@ angular.module 'clickingGame', []
     else
       {x: event.offsetX, y: event.offsetY} # Other browsers
 
+  $scope.userClick = 1
   $scope.canvasClick = ($event) ->
     pt = getXY $event
-    approxNum = 1
-    _.times Math.round(_.normalRandom(approxNum, approxNum*0.3)), () ->
+    _.times Math.round(_.normalRandom($scope.userClick, $scope.userClick*0.3)), () ->
       size = _.normalRandom(40, 20)
       CanvasDrawing.addDrop
         img: _.sample(dropImages, 1)[0]
@@ -33,6 +33,86 @@ angular.module 'clickingGame', []
         xspeed: _.normalRandom(0, 10)
         yspeed: _.normalRandom(-9, 6)
         yacceleration: 1
+
+
+  $scope.buyClicker = (clicker) ->
+    return if $scope.drops < clicker.price
+    $scope.drops -= clicker.price
+    if clicker.bought >= 1
+      clicker.upgrade(clicker)
+    clicker.bought++
+    clicker.buy(clicker)
+
+
+  $scope.autoclickers = []
+  CanvasDrawing.onMove (movedt) ->
+    _.each $scope.autoclickers, (clicker) ->
+      return if clicker.bought <= 0
+      return if clicker.every <= 0
+
+      clicker.has += movedt
+      while clicker.has > clicker.every
+        clicker.do(clicker)
+        clicker.has -= clicker.every
+
+
+  $scope.autoclickers.push
+    bought: 0
+    has: 0
+    every: 3000
+    price: 100
+    buy: (clicker) ->
+      clicker.price *= 2
+    upgrade: (clicker) ->
+      clicker.drops++
+    drops: 1
+    do: (clicker) ->
+      _.times Math.round(_.normalRandom(clicker.drops, clicker.drops*0.3)), () ->
+        size = _.normalRandom(20, 10)
+        CanvasDrawing.addDrop
+          img: _.sample(dropImages, 1)[0]
+          x: _.normalRandom(CanvasDrawing.width()/2, CanvasDrawing.width()/2) - size/2
+          y: 10 - size/3
+          w: size
+          h: size
+          xspeed: 0
+          yspeed: _.normalRandom(0, 3)
+          yacceleration: 1
+
+  $scope.autoclickers.push
+    bought: 0
+    has: 0
+    every: 30
+    price: 2000
+    buy: (clicker) ->
+      clicker.price *= 3
+    upgrade: (clicker) ->
+      clicker.every *= 0.70
+    do: (clicker) ->
+      size = _.normalRandom(10, 5)
+      CanvasDrawing.addDrop
+        img: _.sample(dropImages, 1)[0]
+        x: _.random(0, CanvasDrawing.width()) - size/2
+        y: 10 - size/3
+        w: size
+        h: size
+        xspeed: 0
+        yspeed: _.normalRandom(0, 3)
+        yacceleration: 1
+
+  $scope.miscupgrades = []
+  $scope.miscupgrades.push
+    bought: 0
+    price: 200
+    buy: (clicker) ->
+      $scope.userClick++
+      clicker.removed = true
+
+
+
+.filter 'notRemoved', () ->
+  (clickers) -> _.reject clickers, {removed: true}
+
 
 
 .factory 'CanvasDrawing', () ->
@@ -48,6 +128,7 @@ angular.module 'clickingGame', []
 
   drops = []
   dropsRemoved = (num) -> null
+  move_dt = (movedt) -> null
 
   moveDrop = (drop) ->
     drop.y = drop.y + drop.yspeed
@@ -70,6 +151,7 @@ angular.module 'clickingGame', []
       accumulator -= movedt
 
       dropsRemoved(prevNumDrops - drops.length)
+      move_dt(movedt)
 
 
     ctx.clearRect 0, 0, canvas.width, canvas.height
@@ -86,6 +168,9 @@ angular.module 'clickingGame', []
   return {
     addDrop: (obj) -> drops.push obj
     onDrops: (fn) -> dropsRemoved = fn
+    onMove: (fn) -> move_dt = fn
+    width: () -> canvas.width
+    height: () -> canvas.height
   }
 
 

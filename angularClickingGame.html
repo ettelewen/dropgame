@@ -43,8 +43,11 @@
         <div class="progress-bar" ng-style="{width: drops/10000*100 + '%'}"></div>
       </div>
 
-      <button class="btn btn-default" ng-click="drops = drops+1">Add <i class="glyphicon glyphicon-tint"></i></button>
-      <button class="btn btn-default" ng-click="drops = drops*10">Multiply by 10</button>
+      <button class="btn btn-default btn-danger pull-right" ng-click="drops = drops*10">Multiply by 10</button>
+
+      <button class="btn btn-default" ng-repeat="clicker in autoclickers.concat(miscupgrades) | notRemoved" ng-disabled="clicker.price > drops" ng-click="buyClicker(clicker)">
+        {{clicker.price}}
+      </button>
     </div>
 
     <canvas width="1000" height="700" id="canvas" ng-click="canvasClick($event)" unselectable="on"></canvas>
