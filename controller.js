@@ -75,6 +75,7 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
     });
   });
   $scope.autoclickers.push({
+    text: 'Leaking ceiling',
     bought: 0,
     has: 0,
     every: 3000,
@@ -104,6 +105,7 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
     }
   });
   $scope.autoclickers.push({
+    text: 'Open rooftop',
     bought: 0,
     has: 0,
     every: 30,
@@ -131,6 +133,7 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
   });
   $scope.miscupgrades = [];
   return $scope.miscupgrades.push({
+    text: 'Double clicks',
     bought: 0,
     price: 200,
     buy: function(clicker) {

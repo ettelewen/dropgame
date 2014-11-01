@@ -57,6 +57,7 @@ angular.module 'clickingGame', ['ui.bootstrap']
 
 
   $scope.autoclickers.push
+    text: 'Leaking ceiling'
     bought: 0
     has: 0
     every: 3000
@@ -80,6 +81,7 @@ angular.module 'clickingGame', ['ui.bootstrap']
           yacceleration: 1
 
   $scope.autoclickers.push
+    text: 'Open rooftop'
     bought: 0
     has: 0
     every: 30
@@ -102,6 +104,7 @@ angular.module 'clickingGame', ['ui.bootstrap']
 
   $scope.miscupgrades = []
   $scope.miscupgrades.push
+    text: 'Double clicks'
     bought: 0
     price: 200
     buy: (clicker) ->
