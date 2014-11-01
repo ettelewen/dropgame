@@ -3,6 +3,10 @@
 angular.module('clickingGame', []).controller('RootCtrl', function($scope, $timeout, CanvasDrawing) {
   var dropImages, getXY;
   $scope.drops = 0;
+  CanvasDrawing.onDrops(function(numDrops) {
+    $scope.drops += numDrops;
+    return $scope.$digest();
+  });
   $scope.dropImgFiles = ['tint_1.png', 'tint_2.png', 'tint_3.png'];
   dropImages = [];
   $timeout(function() {
@@ -27,7 +31,7 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
     return _.times(10, function() {
       var size;
       size = _.normalRandom(40, 20);
-      CanvasDrawing.addDrop({
+      return CanvasDrawing.addDrop({
         img: _.sample(dropImages, 1)[0],
         x: pt.x - size / 2,
         y: pt.y - size / 3,
@@ -37,14 +41,16 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
         yspeed: _.normalRandom(-9, 6),
         yacceleration: 1
       });
-      return $scope.drops++;
     });
   };
 }).factory('CanvasDrawing', function() {
-  var accumulator, animloop, canvas, ctx, currTime, drops, moveDrop, movedt, render;
+  var accumulator, animloop, canvas, ctx, currTime, drops, dropsRemoved, moveDrop, movedt, render;
   canvas = document.getElementById('canvas');
   ctx = new Context2DWrapper(canvas.getContext('2d'));
   drops = [];
+  dropsRemoved = function(num) {
+    return null;
+  };
   moveDrop = function(drop) {
     drop.y = drop.y + drop.yspeed;
     drop.yspeed = drop.yspeed + drop.yacceleration;
@@ -56,13 +62,15 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
   accumulator = 0;
   currTime = 0;
   render = function(time) {
-    var dt;
+    var dt, prevNumDrops;
     dt = time - currTime;
     currTime = time;
     accumulator += dt;
     while (accumulator > movedt) {
+      prevNumDrops = drops.length;
       drops = _.filter(drops, moveDrop);
       accumulator -= movedt;
+      dropsRemoved(prevNumDrops - drops.length);
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     _.each(drops, function(drop) {
@@ -78,6 +86,9 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
   return {
     addDrop: function(obj) {
       return drops.push(obj);
+    },
+    onDrops: function(fn) {
+      return dropsRemoved = fn;
     }
   };
 });

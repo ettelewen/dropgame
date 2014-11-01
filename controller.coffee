@@ -4,6 +4,11 @@ angular.module 'clickingGame', []
 .controller 'RootCtrl', ($scope, $timeout, CanvasDrawing) ->
   $scope.drops = 0
 
+  CanvasDrawing.onDrops (numDrops) ->
+    $scope.drops += numDrops
+    $scope.$digest()
+
+
   $scope.dropImgFiles = ['tint_1.png', 'tint_2.png', 'tint_3.png']
   dropImages = []
   $timeout () -> dropImages = $('.drops .drop')
@@ -27,7 +32,6 @@ angular.module 'clickingGame', []
         xspeed: _.normalRandom(0, 10)
         yspeed: _.normalRandom(-9, 6)
         yacceleration: 1
-      $scope.drops++;
 
 
 .factory 'CanvasDrawing', () ->
@@ -35,6 +39,7 @@ angular.module 'clickingGame', []
   ctx = new Context2DWrapper canvas.getContext '2d'
 
   drops = []
+  dropsRemoved = (num) -> null
 
   moveDrop = (drop) ->
     drop.y = drop.y + drop.yspeed
@@ -52,8 +57,12 @@ angular.module 'clickingGame', []
     accumulator += dt
 
     while accumulator > movedt
+      prevNumDrops = drops.length
       drops = _.filter drops, moveDrop
       accumulator -= movedt
+
+      dropsRemoved(prevNumDrops - drops.length)
+
 
     ctx.clearRect 0, 0, canvas.width, canvas.height
     _.each drops, (drop) ->
@@ -68,7 +77,9 @@ angular.module 'clickingGame', []
 
   return {
     addDrop: (obj) -> drops.push obj
+    onDrops: (fn) -> dropsRemoved = fn
   }
+
 
 _.mixin
   normalRandom: (middle, delta) -> # normally distributed random
