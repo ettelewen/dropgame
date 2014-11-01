@@ -26,9 +26,10 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
     }
   };
   return $scope.canvasClick = function($event) {
-    var pt;
+    var approxNum, pt;
     pt = getXY($event);
-    return _.times(10, function() {
+    approxNum = 1;
+    return _.times(Math.round(_.normalRandom(approxNum, approxNum * 0.3)), function() {
       var size;
       size = _.normalRandom(40, 20);
       return CanvasDrawing.addDrop({
@@ -47,6 +48,16 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
   var accumulator, animloop, canvas, ctx, currTime, drops, dropsRemoved, moveDrop, movedt, render;
   canvas = document.getElementById('canvas');
   ctx = new Context2DWrapper(canvas.getContext('2d'));
+  $(window).on('resize', function() {
+    $(canvas).attr({
+      height: 0
+    });
+    return $(canvas).attr({
+      width: $(canvas).parent().width(),
+      height: $(canvas).parent().height() - $(canvas).offset().top
+    });
+  });
+  $(window).trigger('resize');
   drops = [];
   dropsRemoved = function(num) {
     return null;
@@ -56,7 +67,7 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
     drop.yspeed = drop.yspeed + drop.yacceleration;
     drop.xspeed = drop.xspeed / 1.03;
     drop.x += drop.xspeed;
-    return drop.y < 700;
+    return drop.y < canvas.height;
   };
   movedt = 1000 / 60;
   accumulator = 0;
@@ -73,10 +84,9 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
       dropsRemoved(prevNumDrops - drops.length);
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    _.each(drops, function(drop) {
+    return _.each(drops, function(drop) {
       return ctx.drawImage(drop.img, drop.x, drop.y, drop.w, drop.h);
     });
-    return console.log(drops.length, dt, time);
   };
   animloop = function(time) {
     requestAnimationFrame(animloop);

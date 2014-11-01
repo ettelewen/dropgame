@@ -14,14 +14,15 @@ angular.module 'clickingGame', []
   $timeout () -> dropImages = $('.drops .drop')
 
   getXY = (event) ->
-    if event.offsetX == null # Firefox
-      {x: event.originalEvent.layerX, y: event.originalEvent.layerY}
+    if event.offsetX == null
+      {x: event.originalEvent.layerX, y: event.originalEvent.layerY} # Firefox
     else
       {x: event.offsetX, y: event.offsetY} # Other browsers
 
   $scope.canvasClick = ($event) ->
     pt = getXY $event
-    _.times 10, () ->
+    approxNum = 1
+    _.times Math.round(_.normalRandom(approxNum, approxNum*0.3)), () ->
       size = _.normalRandom(40, 20)
       CanvasDrawing.addDrop
         img: _.sample(dropImages, 1)[0]
@@ -37,6 +38,13 @@ angular.module 'clickingGame', []
 .factory 'CanvasDrawing', () ->
   canvas = document.getElementById 'canvas'
   ctx = new Context2DWrapper canvas.getContext '2d'
+  $(window).on 'resize', ->
+    $(canvas).attr
+      height: 0
+    $(canvas).attr
+      width: $(canvas).parent().width()
+      height: $(canvas).parent().height() - $(canvas).offset().top
+  $(window).trigger('resize')
 
   drops = []
   dropsRemoved = (num) -> null
@@ -46,7 +54,7 @@ angular.module 'clickingGame', []
     drop.yspeed = drop.yspeed + drop.yacceleration
     drop.xspeed = drop.xspeed/1.03
     drop.x += drop.xspeed
-    drop.y < 700
+    drop.y < canvas.height
 
   movedt = 1000/60
   accumulator = 0 # http://gafferongames.com/game-physics/fix-your-timestep/
@@ -68,7 +76,7 @@ angular.module 'clickingGame', []
     _.each drops, (drop) ->
       ctx.drawImage drop.img, drop.x, drop.y, drop.w, drop.h
 
-    console.log drops.length, dt, time
+    #console.log drops.length, dt, time
 
   animloop = (time) ->
     requestAnimationFrame animloop
