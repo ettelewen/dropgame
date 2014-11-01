@@ -3,7 +3,7 @@
   <head>
     <title>Clicking game</title>
     <meta charset="utf-8">
-    <link href="bootstrap-3.3.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="libs/bootstrap-3.3.0-dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       .label-lg {
         font-size: 100%;
@@ -25,10 +25,13 @@
       html, body {
         height: 100%;
       }
+
+
     </style>
     <link rel="icon" type="image/png" href="tint_1.png" />
   </head>
   <body ng-controller="RootCtrl">
+
 
     <br>
     <h1 class="container">
@@ -64,12 +67,12 @@
       <img ng-repeat="file in dropImgFiles" ng-src="{{file}}" class="drop">
     </div>
 
-    <script src="rAF.js"></script>
-    <script src="lodash-2.4.1.min.js"></script>
-    <script src="jquery-2.1.1.min.js"></script>
-    <script src="angular-1.2.26.min.js"></script>
-    <script src="ui-bootstrap-tpls-0.11.2.min.js"></script>
-    <script src="Context2DWrapper-1.0.min.js"></script>
+    <script src="libs/rAF.js"></script>
+    <script src="libs/lodash-2.4.1.min.js"></script>
+    <script src="libs/jquery-2.1.1.min.js"></script>
+    <script src="libs/angular-1.2.26.min.js"></script>
+    <script src="libs/ui-bootstrap-tpls-0.11.2.min.js"></script>
+    <script src="libs/Context2DWrapper-1.0.min.js"></script>
     <script src="controller.js"></script>
   </body>
 </html>
