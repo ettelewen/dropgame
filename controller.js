@@ -22,39 +22,50 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
     }
   };
   return $scope.canvasClick = function($event) {
-    var pt, size;
+    var pt;
     pt = getXY($event);
-    size = _.random(20, 64);
-    CanvasDrawing.addDrop({
-      img: _.sample(dropImages, 1)[0],
-      x: pt.x - size / 2,
-      y: pt.y - size / 3,
-      w: size,
-      h: size,
-      xacceleration: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3),
-      yacceleration: _.random(-15, -3)
+    return _.times(10000, function() {
+      var size;
+      size = _.random(20, 64);
+      CanvasDrawing.addDrop({
+        img: _.sample(dropImages, 1)[0],
+        x: pt.x - size / 2,
+        y: pt.y - size / 3,
+        w: size,
+        h: size,
+        xacceleration: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3),
+        yacceleration: _.random(-15, -3)
+      });
+      return $scope.drops++;
     });
-    return $scope.drops++;
   };
 }).factory('CanvasDrawing', function() {
-  var canvas, ctx, drops;
+  var animloop, canvas, ctx, drops, moveDrop, prevTime, render;
   canvas = document.getElementById('canvas');
   ctx = new Context2DWrapper(canvas.getContext('2d'));
   drops = [];
-  setInterval(function() {
+  moveDrop = function(drop) {
+    ctx.drawImage(drop.img, drop.x, drop.y, drop.w, drop.h);
+    drop.yacceleration += 1;
+    drop.y += drop.yacceleration;
+    drop.xacceleration /= 1.03;
+    drop.x += drop.xacceleration;
+    return drop.y < 700;
+  };
+  prevTime = 0;
+  render = function(time) {
+    var timeDiff;
+    timeDiff = time - prevTime;
+    prevTime = time;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    _.each(drops, function(drop) {
-      ctx.drawImage(drop.img, drop.x, drop.y, drop.w, drop.h);
-      drop.yacceleration += 1;
-      drop.y += drop.yacceleration;
-      drop.xacceleration /= 1.03;
-      return drop.x += drop.xacceleration;
-    });
-    drops = _.filter(drops, function(drop) {
-      return drop.y < 700;
-    });
-    return console.log(drops.length);
-  }, 10);
+    drops = _.filter(drops, moveDrop);
+    return console.log(drops.length, timeDiff, time);
+  };
+  animloop = function(time) {
+    requestAnimationFrame(animloop);
+    return render(time);
+  };
+  animloop(0);
   return {
     addDrop: function(obj) {
       return drops.push(obj);
