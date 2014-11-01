@@ -18,17 +18,10 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
     return dropImages = $('.drops .drop');
   });
   getXY = function(event) {
-    if (event.offsetX === null) {
-      return {
-        x: event.originalEvent.layerX,
-        y: event.originalEvent.layerY
-      };
-    } else {
-      return {
-        x: event.offsetX,
-        y: event.offsetY
-      };
-    }
+    return {
+      x: event.pageX - $(event.target).offset().left,
+      y: event.pageY - $(event.target).offset().top
+    };
   };
   $scope.userClick = 1;
   $scope.canvasClick = function($event) {
@@ -182,9 +175,12 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
   };
   movedt = 1000 / 60;
   accumulator = 0;
-  currTime = 0;
+  currTime = false;
   render = function(time) {
     var dt, prevNumDrops;
+    if (!currTime) {
+      currTime = time;
+    }
     dt = time - currTime;
     currTime = time;
     accumulator += dt;

@@ -17,10 +17,8 @@ angular.module 'clickingGame', ['ui.bootstrap']
   $timeout () -> dropImages = $('.drops .drop')
 
   getXY = (event) ->
-    if event.offsetX == null
-      {x: event.originalEvent.layerX, y: event.originalEvent.layerY} # Firefox
-    else
-      {x: event.offsetX, y: event.offsetY} # Other browsers
+    x: event.pageX - $(event.target).offset().left
+    y: event.pageY - $(event.target).offset().top
 
   $scope.userClick = 1
   $scope.canvasClick = ($event) ->
@@ -145,8 +143,9 @@ angular.module 'clickingGame', ['ui.bootstrap']
 
   movedt = 1000/60
   accumulator = 0 # http://gafferongames.com/game-physics/fix-your-timestep/
-  currTime = 0
+  currTime = false
   render = (time) ->
+    currTime = time if !currTime
     dt = time - currTime;
     currTime = time;
     accumulator += dt
