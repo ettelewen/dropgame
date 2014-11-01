@@ -4,6 +4,9 @@ angular.module 'clickingGame', ['ui.bootstrap']
 .controller 'RootCtrl', ($scope, $timeout, $interval, CanvasDrawing) ->
   $scope.drops = 0
 
+  $scope.$watch 'drops', (drops) ->
+    document.title = drops + ' drops' if $scope.drops > 0
+
   CanvasDrawing.onDrops (numDrops) ->
     $scope.drops += numDrops
     $scope.$digest()
@@ -161,7 +164,6 @@ angular.module 'clickingGame', ['ui.bootstrap']
     _.each drops, (drop) ->
       ctx.drawImage drop.img, drop.x, drop.y, drop.w, drop.h
 
-    #console.log drops.length, dt, time
 
   animloop = (time) ->
     requestAnimationFrame animloop

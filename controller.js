@@ -3,6 +3,11 @@
 angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function($scope, $timeout, $interval, CanvasDrawing) {
   var dropImages, getXY;
   $scope.drops = 0;
+  $scope.$watch('drops', function(drops) {
+    if ($scope.drops > 0) {
+      return document.title = drops + ' drops';
+    }
+  });
   CanvasDrawing.onDrops(function(numDrops) {
     $scope.drops += numDrops;
     return $scope.$digest();
