@@ -24,8 +24,8 @@ angular.module 'clickingGame', []
         y: pt.y - size/3
         w: size
         h: size
-        xacceleration: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3) # uniform random
-        yacceleration: _.random(-15, -3)
+        xspeed: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3) # normally distributed random
+        yspeed: _.random(-15, -3)
       $scope.drops++;
 
 
@@ -34,23 +34,32 @@ angular.module 'clickingGame', []
   ctx = new Context2DWrapper canvas.getContext '2d'
 
   drops = []
+
+  yacceleration = 1
   moveDrop = (drop) ->
-    ctx.drawImage drop.img, drop.x, drop.y, drop.w, drop.h
-    drop.yacceleration += 1
-    drop.y += drop.yacceleration
-    drop.xacceleration /= 1.03
-    drop.x += drop.xacceleration
+    drop.y = drop.y + drop.yspeed
+    drop.yspeed = drop.yspeed + yacceleration
+    drop.xspeed = drop.xspeed/1.03
+    drop.x += drop.xspeed
     drop.y < 700
 
-  prevTime = 0
+  movedt = 1000/60
+  accumulator = 0 # http://gafferongames.com/game-physics/fix-your-timestep/
+  currTime = 0
   render = (time) ->
-    timeDiff = time - prevTime;
-    prevTime = time;
+    dt = time - currTime;
+    currTime = time;
+    accumulator += dt
+
+    while accumulator > movedt
+      drops = _.filter drops, moveDrop
+      accumulator -= movedt
 
     ctx.clearRect 0, 0, canvas.width, canvas.height
+    _.each drops, (drop) ->
+      ctx.drawImage drop.img, drop.x, drop.y, drop.w, drop.h
 
-    drops = _.filter drops, moveDrop
-    console.log drops.length, timeDiff, time
+    console.log drops.length, dt, time
 
   animloop = (time) ->
     requestAnimationFrame animloop

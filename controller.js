@@ -33,33 +33,42 @@ angular.module('clickingGame', []).controller('RootCtrl', function($scope, $time
         y: pt.y - size / 3,
         w: size,
         h: size,
-        xacceleration: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3),
-        yacceleration: _.random(-15, -3)
+        xspeed: _.random(-3, 3) + _.random(-3, 3) + _.random(-3, 3),
+        yspeed: _.random(-15, -3)
       });
       return $scope.drops++;
     });
   };
 }).factory('CanvasDrawing', function() {
-  var animloop, canvas, ctx, drops, moveDrop, prevTime, render;
+  var accumulator, animloop, canvas, ctx, currTime, drops, moveDrop, movedt, render, yacceleration;
   canvas = document.getElementById('canvas');
   ctx = new Context2DWrapper(canvas.getContext('2d'));
   drops = [];
+  yacceleration = 1;
   moveDrop = function(drop) {
-    ctx.drawImage(drop.img, drop.x, drop.y, drop.w, drop.h);
-    drop.yacceleration += 1;
-    drop.y += drop.yacceleration;
-    drop.xacceleration /= 1.03;
-    drop.x += drop.xacceleration;
+    drop.y = drop.y + drop.yspeed;
+    drop.yspeed = drop.yspeed + yacceleration;
+    drop.xspeed = drop.xspeed / 1.03;
+    drop.x += drop.xspeed;
     return drop.y < 700;
   };
-  prevTime = 0;
+  movedt = 1000 / 60;
+  accumulator = 0;
+  currTime = 0;
   render = function(time) {
-    var timeDiff;
-    timeDiff = time - prevTime;
-    prevTime = time;
+    var dt;
+    dt = time - currTime;
+    currTime = time;
+    accumulator += dt;
+    while (accumulator > movedt) {
+      drops = _.filter(drops, moveDrop);
+      accumulator -= movedt;
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drops = _.filter(drops, moveDrop);
-    return console.log(drops.length, timeDiff, time);
+    _.each(drops, function(drop) {
+      return ctx.drawImage(drop.img, drop.x, drop.y, drop.w, drop.h);
+    });
+    return console.log(drops.length, dt, time);
   };
   animloop = function(time) {
     requestAnimationFrame(animloop);
