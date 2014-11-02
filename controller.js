@@ -42,6 +42,9 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
       });
     });
   };
+  $scope.canvasMove = function($event) {
+    return null;
+  };
   $scope.buyClicker = function(clicker) {
     if ($scope.drops < clicker.price) {
       return;
@@ -130,12 +133,23 @@ angular.module('clickingGame', ['ui.bootstrap']).controller('RootCtrl', function
     }
   });
   $scope.miscupgrades = [];
-  return $scope.miscupgrades.push({
+  $scope.miscupgrades.push({
     text: 'Double clicks',
     bought: 0,
     price: 200,
     buy: function(clicker) {
       $scope.userClick++;
+      return clicker.removed = true;
+    }
+  });
+  return $scope.miscupgrades.push({
+    text: 'Move clicks',
+    bought: 0,
+    price: 200,
+    buy: function(clicker) {
+      $scope.canvasMove = _.throttle(function($event) {
+        return $scope.canvasClick($event);
+      }, 100);
       return clicker.removed = true;
     }
   });

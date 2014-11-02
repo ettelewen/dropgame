@@ -35,6 +35,7 @@ angular.module 'clickingGame', ['ui.bootstrap']
         yspeed: _.normalRandom(-9, 6)
         yacceleration: 1
 
+  $scope.canvasMove = ($event) -> null
 
   $scope.buyClicker = (clicker) ->
     return if $scope.drops < clicker.price
@@ -111,6 +112,17 @@ angular.module 'clickingGame', ['ui.bootstrap']
     buy: (clicker) ->
       $scope.userClick++
       clicker.removed = true
+
+  $scope.miscupgrades.push
+    text: 'Move clicks'
+    bought: 0
+    price: 200
+    buy: (clicker) ->
+      $scope.canvasMove = _.throttle ($event) ->
+        $scope.canvasClick $event
+      , 100
+      clicker.removed = true
+
 
 
 
