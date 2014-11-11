@@ -1,0 +1,78 @@
+<!doctype html>
+<html ng-app="clickingGame">
+  <head>
+    <title>Clicking game</title>
+    <meta charset="utf-8">
+    <link href="libs/bootstrap-3.3.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .label-lg {
+        font-size: 100%;
+      }
+      #canvas {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        cursor: pointer;
+        border-top: 1px solid #ddd;
+      }
+      .btn-wrapper {
+        display: inline-block;
+      }
+      html, body {
+        height: 100%;
+      }
+
+
+    </style>
+    <link rel="icon" type="image/png" href="tint_1.png" />
+  </head>
+  <body ng-controller="RootCtrl">
+
+
+    <br>
+    <h1 class="container">
+      Click
+      &nbsp;
+      <span class="label label-info">{{ drops }} <i class="glyphicon glyphicon-tint"></i></span>
+    </h1>
+    <hr>
+
+    <div class="container">
+      <div class="alert alert-warning" ng-if="drops > 1000000000000000">
+        There might soon be issues with adding numbers: 10000000000000000 + 1 == {{10000000000000000+1}}
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" ng-style="{width: drops/10000*100 + '%'}"></div>
+      </div>
+
+      <button class="btn btn-default btn-danger pull-right" ng-click="drops = drops*10">Multiply by 10</button>
+
+      <div ng-repeat="clicker in autoclickers.concat(miscupgrades) | notRemoved | orderBy:'price'" class="btn-wrapper" tooltip="{{clicker.text}}">
+        <button class="btn btn-default" ng-disabled="clicker.price > drops" ng-click="buyClicker(clicker)">
+          {{clicker.price}} <i class="glyphicon glyphicon-tint"></i>
+        </button>
+      </div>
+    </div>
+
+    <canvas width="1000" height="700" id="canvas" ng-click="canvasClick($event)" ng-mousemove="canvasMove($event)" unselectable="on"></canvas>
+
+
+
+    <div class="drops hide">
+      <img ng-repeat="file in dropImgFiles" ng-src="{{file}}" class="drop">
+    </div>
+
+    <script src="libs/rAF.js"></script>
+    <script src="libs/lodash-2.4.1.min.js"></script>
+    <script src="libs/jquery-2.1.1.min.js"></script>
+    <script src="libs/angular-1.2.26.min.js"></script>
+    <script src="libs/ui-bootstrap-tpls-0.11.2.min.js"></script>
+    <script src="libs/Context2DWrapper-1.0.min.js"></script>
+    <script src="controller.js"></script>
+  </body>
+</html>
